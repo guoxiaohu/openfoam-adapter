@@ -59,6 +59,14 @@ bool preciceAdapter::FF::FluidFluid::readConfig(const IOdictionary& adapterConfi
     nameP_ = FFdict.lookupOrDefault<word>("nameP", "p");
     DEBUG(adapterInfo("    pressure field name : " + nameP_));
 
+    // Read the name of the alpha field (if different)
+    nameA_ = FFdict.lookupOrDefault<word>("nameA", "alpha.water");
+    DEBUG(adapterInfo("    alpha field name : " + nameA_));
+
+    // Read the name of the prgh field (if different)
+    namePrgh_ = FFdict.lookupOrDefault<word>("namePrgh", "p_rgh");
+    DEBUG(adapterInfo("    p_rgh field name : " + namePrgh_));    
+
     return true;
 }
 
@@ -129,6 +137,34 @@ bool preciceAdapter::FF::FluidFluid::addWriters(std::string dataName, Interface*
             new Pressure(mesh_, nameP_));
         DEBUG(adapterInfo("Added writer: Pressure."));
     }
+    else if (dataName.find("AlphaGradient") == 0)
+    {
+        interface->addCouplingDataWriter(
+            dataName,
+            new AlphaGradient(mesh_, nameA_));
+        DEBUG(adapterInfo("Added writer: Alpha Gradient."));
+    }
+    else if (dataName.find("Alpha") == 0)
+    {
+        interface->addCouplingDataWriter(
+            dataName,
+            new Alpha(mesh_, nameA_));
+        DEBUG(adapterInfo("Added writer: Alpha."));
+    }
+    else if (dataName.find("PrghGradient") == 0)
+    {
+        interface->addCouplingDataWriter(
+            dataName,
+            new PrghGradient(mesh_, namePrgh_));
+        DEBUG(adapterInfo("Added writer: Prgh Gradient."));
+    }
+    else if (dataName.find("Prgh") == 0)
+    {
+        interface->addCouplingDataWriter(
+            dataName,
+            new Prgh(mesh_, namePrgh_));
+        DEBUG(adapterInfo("Added writer: Prgh."));
+    }    
     else
     {
         found = false;
@@ -175,6 +211,34 @@ bool preciceAdapter::FF::FluidFluid::addReaders(std::string dataName, Interface*
             new Pressure(mesh_, nameP_));
         DEBUG(adapterInfo("Added reader: Pressure."));
     }
+    else if (dataName.find("AlphaGradient") == 0)
+    {
+        interface->addCouplingDataReader(
+            dataName,
+            new AlphaGradient(mesh_, nameA_));
+        DEBUG(adapterInfo("Added reader: Alpha Gradient."));
+    }
+    else if (dataName.find("Alpha") == 0)
+    {
+        interface->addCouplingDataReader(
+            dataName,
+            new Alpha(mesh_, nameA_));
+        DEBUG(adapterInfo("Added reader: Alpha."));
+    }
+    else if (dataName.find("Prgh Gradient") == 0)
+    {
+        interface->addCouplingDataReader(
+            dataName,
+            new PrghGradient(mesh_, namePrgh_));
+        DEBUG(adapterInfo("Added reader: Prgh Gradient."));
+    }
+    else if (dataName.find("Prgh") == 0)
+    {
+        interface->addCouplingDataReader(
+            dataName,
+            new Prgh(mesh_, namePrgh_));
+        DEBUG(adapterInfo("Added reader: Prgh."));
+    }    
     else
     {
         found = false;
